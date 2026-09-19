@@ -15,17 +15,29 @@
 module(name = "rust-toolchain-bazel")
 
 ###############################################################################
+# Copybara
+###############################################################################
+
+# We use copybara to acquire a local copy of the rust toolchain and to generate
+# the Bazel BUILD files for the Rust toolchain in that tree.
+# see: https://registry.bazel.build/modules/copybara/
+http_jar(
+    name = "com_github_google_copybara",
+    # Fill in from https://github.com/google/copybara/releases/download/[version]/copybara_deploy.jar.sha256
+    sha256 = "897d3567ed562b44a247deeaa77565ee644dbb3327157a29a9297bbec4b270ee",
+    urls = ["https://github.com/google/copybara/releases/download/v20260914/copybara_deploy.jar"],
+)
+
+###############################################################################
 # Rust
 ###############################################################################
 
-# We use copybara to generate the Bazel BUILD files for the Rust toolchain.
-# see: https://registry.bazel.build/modules/copybara/
-# TODO: There have been a number of releases to copybara since 2025-07-28, why
-# are those not reflected in the bazel integration?
-bazel_dep(name = "copybara", version = "0.0.0-20250728-6672ce2")
-bazel_dep(name = "rust-raw")
+bazel_dep(name = "rust")
 git_override(
-    module_name = "rust-raw",
+    module_name = "rust",
     build_file_content = "# empty",
+    # We pin to specific Rust revisions and try to track HEAD fairly closely.
+    # HEAD around 2026-09-19
+    commit = "48a229ceaefd4985c50990b14116b6d856af0985",
     remote = "https://github.com/rust-lang/rust.git",
 )
